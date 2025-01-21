@@ -9,6 +9,7 @@ struct Node
 
 	Node* parent;
 	Vector2 position;
+	//g , h, f
 	int costFromStart, heuristic, totalCost;
 };
 

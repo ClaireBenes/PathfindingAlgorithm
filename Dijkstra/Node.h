@@ -4,13 +4,13 @@
 
 struct Node
 {
-	Node(Vector2 pPosition = Vector2());
+	Node(Vector2 pPosition = Vector2(0,0));
 	int GetDistance(Node* from);
 
 	Node* parent;
 	Vector2 position;
-	//g , h, f
-	int costFromStart, heuristic, totalCost;
+
+	int g, h, f;
 };
 
 

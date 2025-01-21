@@ -5,9 +5,9 @@
 
 Node::Node(Vector2 pPosition) : position(pPosition)
 {
-	costFromStart = inf;
-	heuristic = inf;
-	totalCost = inf;
+	g = inf;
+	h = inf;
+	f = inf;
 
 	parent = nullptr;
 }

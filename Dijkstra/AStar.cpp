@@ -7,21 +7,33 @@ void AStar::Algorithm()
 	std::vector<Node> openNodes;
 	std::vector<Node> closedNodes;
 
-	Node startNode;
-	openNodes.push_back(startNode);
+	Node* goal = new Node { Vector2(50, 75) };
+	Node* startNode = new Node { Vector2(0, 0) };
+
+	openNodes.push_back(*startNode);
 
 	while(!openNodes.empty())
 	{
-		Node* currentNode;
-		for(Node &node : openNodes)
+		Node* currentNode = &openNodes.front();
+		openNodes.erase(openNodes.begin());
+
+		if (currentNode->position == goal->position)
 		{
-			if(node.totalCost < currentNode->totalCost)
+			std::vector<Node*> path;
+			while (currentNode)
 			{
-				currentNode = &node;
+				path.push_back(currentNode);
+				currentNode = currentNode->parent;
 			}
+			//std::reverse(path.begin(), path.end());
+			//return path;
 		}
 
-		auto it = std::find(openNodes.begin(), openNodes.end(), currentNode);
-		openNodes.erase(it);
+		closedNodes.push_back(*currentNode);
 	}
+}
+
+float AStar::Heuristic(Node* a, Node* b)
+{
+	return std::abs(a->position.x - b->position.x) + std::abs(a->position.y - b->position.y);
 }

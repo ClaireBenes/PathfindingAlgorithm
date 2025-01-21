@@ -2,22 +2,38 @@
 
 #include <vector>
 
-void AStar::Algorithm()
+void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, Vector2 goal)
 {
-	std::vector<Node> openNodes;
-	std::vector<Node> closedNodes;
+	std::vector<Node*> openNodes;
+	std::vector<Node*> closedNodes;
 
-	Node* goal = new Node { Vector2(50, 75) };
-	Node* startNode = new Node { Vector2(0, 0) };
+	Node* startNode = new Node(start);
+	Node* goalNode = new Node(goal);
 
-	openNodes.push_back(*startNode);
+	startNode->g = 0;
+	startNode->h = Heuristic(startNode, goalNode);
+	startNode->f = startNode->g + startNode->h;
+	openNodes.push_back(startNode);
 
 	while(!openNodes.empty())
 	{
-		Node* currentNode = &openNodes.front();
-		openNodes.erase(openNodes.begin());
+		// Find the node with the lowest f-score
+		Node* currentNode = openNodes[0];
+		int lowestFIndex = 0;
 
-		if (currentNode->position == goal->position)
+		for (size_t i = 1; i < openNodes.size(); ++i)
+		{
+			if (openNodes[i]->f < currentNode->f)
+			{
+				currentNode = openNodes[i];
+				lowestFIndex = i;
+			}
+		}
+
+		// Remove the current node from openNodes
+		openNodes.erase(openNodes.begin() + lowestFIndex);
+
+		if (currentNode->position == goalNode->position)
 		{
 			std::vector<Node*> path;
 			while (currentNode)
@@ -25,15 +41,119 @@ void AStar::Algorithm()
 				path.push_back(currentNode);
 				currentNode = currentNode->parent;
 			}
-			//std::reverse(path.begin(), path.end());
-			//return path;
+
+			std::reverse(path.begin(), path.end());
+
+			// Output the path
+			printf("Path found:\n");
+			for (Node* node : path)
+			{
+				printf("%s", node->position.ToString().c_str());
+			}
+
+			// Clean up dynamically allocated nodes
+			CleanupNodes(openNodes);
+			CleanupNodes(closedNodes);
+			return;
 		}
 
-		closedNodes.push_back(*currentNode);
+		// Add current node to closedNodes
+		closedNodes.push_back(currentNode);
+
+		// Check child
+		for (Node* child : GetChildrens(currentNode,grid))
+		{
+			// If child is in closedNodes, skip it
+			if (std::find(closedNodes.begin(), closedNodes.end(), child) != closedNodes.end())
+			{
+				delete child;
+				continue;
+			}
+
+			// Calculate g, h, and f values
+			child->g = currentNode->g + currentNode->GetDistance(child);
+			child->h = Heuristic(child, goalNode);
+			child->f = child->g + child->h;
+
+			// Check if the child is in the open list
+			auto openIt = std::find(openNodes.begin(), openNodes.end(), child);
+
+			if (openIt != openNodes.end()) // Already in open list
+			{
+				if (child->g >= (*openIt)->g)
+				{
+					delete child;
+					continue;
+				}
+				else // Better path found, update the node
+				{
+					(*openIt)->g = child->g;
+					(*openIt)->f = child->f;
+					(*openIt)->parent = currentNode;
+					delete child;
+				}
+			}
+			else // Add the child to the open list
+			{
+				child->parent = currentNode;
+				openNodes.push_back(child);
+			}
+		}
 	}
+
+	// No path found
+	printf("No Path found !\n");
+
+	// Clean up dynamically allocated nodes
+	CleanupNodes(openNodes);
+	CleanupNodes(closedNodes);
 }
 
+// GetChildrens function for grid
+std::vector<Node*> AStar::GetChildrens(Node* current, const std::vector<std::vector<int>>& grid)
+{
+	std::vector<Node*> childrens;
+
+	const std::vector<Vector2> directions = 
+	{
+		Vector2(0, -1), // Up
+		Vector2(0, 1),  // Down
+		Vector2(-1, 0), // Left
+		Vector2(1, 0)   // Right
+	};
+
+	for (const Vector2& dir : directions)
+	{
+		Vector2 newPos = current->position + dir;
+
+		// Check bounds
+		if (newPos.x >= 0 && newPos.x < grid.size() &&
+			newPos.y >= 0 && newPos.y < grid[0].size())
+		{
+			// Check if the position is walkable (not an obstacle)
+			if (grid[newPos.x][newPos.y] == 0) // Assuming 0 is walkable and 1 is an obstacle
+			{
+				childrens.push_back(new Node(newPos));
+			}
+		}
+	}
+
+	return childrens;
+}
+
+// Heuristic Function: Manhattan Distance
 float AStar::Heuristic(Node* a, Node* b)
 {
 	return std::abs(a->position.x - b->position.x) + std::abs(a->position.y - b->position.y);
+}
+
+
+// Cleanup Function
+void AStar::CleanupNodes(std::vector<Node*>& nodes)
+{
+	for (Node* node : nodes)
+	{
+		delete node;
+	}
+	nodes.clear();
 }

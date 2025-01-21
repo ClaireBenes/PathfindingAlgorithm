@@ -11,6 +11,7 @@ struct Vector2
 
 	bool operator==(const Vector2& goal) const;
 	Vector2 operator-(const Vector2& vector2) const;
+	Vector2 operator+(const Vector2& vector2) const;
 
 	int x, y;
 };

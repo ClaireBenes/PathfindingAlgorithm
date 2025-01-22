@@ -17,11 +17,11 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 
 	while(!openNodes.empty())
 	{
-		// Find the node with the lowest f-score
+		// Find the node with the lowest f
 		Node* currentNode = openNodes[0];
 		int lowestFIndex = 0;
 
-		for (size_t i = 1; i < openNodes.size(); ++i)
+		for (int i = 0; i < openNodes.size(); ++i)
 		{
 			if (openNodes[i]->f < currentNode->f)
 			{
@@ -33,6 +33,7 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 		// Remove the current node from openNodes
 		openNodes.erase(openNodes.begin() + lowestFIndex);
 
+		// Check if we reached the goal
 		if (currentNode->position == goalNode->position)
 		{
 			std::vector<Node*> path;
@@ -76,20 +77,20 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 			child->f = child->g + child->h;
 
 			// Check if the child is in the open list
-			auto openIt = std::find(openNodes.begin(), openNodes.end(), child);
+			auto children = std::find(openNodes.begin(), openNodes.end(), child);
 
-			if (openIt != openNodes.end()) // Already in open list
+			if (children != openNodes.end()) // Already in open list
 			{
-				if (child->g >= (*openIt)->g)
+				if (child->g >= (*children)->g)
 				{
 					delete child;
 					continue;
 				}
 				else // Better path found, update the node
 				{
-					(*openIt)->g = child->g;
-					(*openIt)->f = child->f;
-					(*openIt)->parent = currentNode;
+					(*children)->g = child->g;
+					(*children)->f = child->f;
+					(*children)->parent = currentNode;
 					delete child;
 				}
 			}

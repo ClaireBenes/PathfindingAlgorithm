@@ -16,3 +16,8 @@ int Node::GetDistance(Node* from)
 {
 	return ( position - from->position ).SqrDistance();
 }
+
+bool Node::operator==(const Node& node) const
+{
+	return position == node.position;
+}

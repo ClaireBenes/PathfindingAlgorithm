@@ -19,19 +19,21 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 	{
 		// Find the node with the lowest f
 		Node* currentNode = openNodes[0];
-		int lowestFIndex = 0;
 
 		for (int i = 0; i < openNodes.size(); ++i)
 		{
 			if (openNodes[i]->f < currentNode->f)
 			{
 				currentNode = openNodes[i];
-				lowestFIndex = i;
 			}
 		}
 
 		// Remove the current node from openNodes
-		openNodes.erase(openNodes.begin() + lowestFIndex);
+		auto it = std::find(openNodes.begin(), openNodes.end(), currentNode);
+		if (it != openNodes.end())
+		{
+			openNodes.erase(it);
+		}
 
 		// Check if we reached the goal
 		if (currentNode->position == goalNode->position)

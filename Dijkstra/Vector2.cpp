@@ -1,17 +1,32 @@
 #include "Vector2.h"
 
-Vector2::Vector2(int x, int y) : x(x), y(y)
+#include <iomanip>
+#include <sstream>
+
+Vector2::Vector2(float x, float y) : x(x), y(y)
 {
 }
 
-int Vector2::SqrDistance()
+float Vector2::SqrDistance()
 {
 	return sqrt(x * x + y * y);
 }
 
 std::string Vector2::ToString()
 {
-	return "(" + std::to_string(x) + " , " + std::to_string(y) + ")";
+	//Round float to .2f and convert it to string
+	//for X
+	std::stringstream xStream;
+	xStream << std::fixed << std::setprecision(0) << x;
+	std::string xPos = xStream.str();
+
+	//for Y
+	std::stringstream yStream;
+	yStream << std::fixed << std::setprecision(0) << y;
+	std::string yPos = yStream.str();
+
+	return "(" + xPos + " , " + yPos + ")";
+	
 }
 
 bool Vector2::operator==(const Vector2& goal) const

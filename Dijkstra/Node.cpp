@@ -12,7 +12,7 @@ Node::Node(Vector2 pPosition) : position(pPosition)
 	parent = nullptr;
 }
 
-int Node::GetDistance(Node* from)
+float Node::GetDistance(Node* from)
 {
 	return ( position - from->position ).SqrDistance();
 }

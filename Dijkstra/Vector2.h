@@ -4,15 +4,15 @@
 
 struct Vector2
 {
-	Vector2(int x = 0, int y = 0);
+	Vector2(float x = 0, float y = 0);
 
-	int SqrDistance();
+	float SqrDistance();
 	std::string ToString();
 
 	bool operator==(const Vector2& goal) const;
 	Vector2 operator-(const Vector2& vector2) const;
 	Vector2 operator+(const Vector2& vector2) const;
 
-	int x, y;
+	float x, y;
 };
 

@@ -12,7 +12,8 @@ int main()
     ////B to I
     //dijkstra.GPS(1, 8);
 
-    std::vector<std::vector<float>> grid = {
+    std::vector<std::vector<float>> grid = 
+    {
         { 0, 0, 0, 1, 0 },
         { 1, 1, 0, 1, 0 },
         { 0, 0, 0, 0.25f, 0 },

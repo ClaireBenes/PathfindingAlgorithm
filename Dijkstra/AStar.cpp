@@ -2,7 +2,7 @@
 
 #include <vector>
 
-void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, Vector2 goal)
+void AStar::Algorithm(const std::vector<std::vector<float>>& grid, Vector2 start, Vector2 goal)
 {
 	std::vector<Node*> openNodes;
 	std::vector<Node*> closedNodes;
@@ -74,10 +74,10 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 			}
 
 			// Calculate g, h, and f values
-			child->g = currentNode->g + currentNode->GetDistance(child);
+			child->g = currentNode->g + currentNode->GetDistance(child) * (1 + 2 * child->costMultiplier);
 			child->h = Heuristic(child, goalNode);
 			child->f = child->g + child->h;
-
+			
 			// Check if the child is in the open list
 			auto children = std::find(openNodes.begin(), openNodes.end(), child);
 
@@ -113,16 +113,20 @@ void AStar::Algorithm(const std::vector<std::vector<int>>& grid, Vector2 start, 
 }
 
 // GetChildrens function for grid
-std::vector<Node*> AStar::GetChildrens(Node* current, const std::vector<std::vector<int>>& grid)
+std::vector<Node*> AStar::GetChildrens(Node* current, const std::vector<std::vector<float>>& grid)
 {
 	std::vector<Node*> childrens;
 
 	const std::vector<Vector2> directions = 
 	{
-		Vector2(0, -1), // Up
-		Vector2(0, 1),  // Down
+		Vector2(0, 1), // Up
+		Vector2(0, -1),  // Down
 		Vector2(-1, 0), // Left
-		Vector2(1, 0)   // Right
+		Vector2(1, 0),   // Right
+		Vector2(-1, 1), //Left - Up
+		Vector2(1, 1), //Right - Up
+		Vector2(-1, -1), //Left - Down
+		Vector2(1, -1) //Right - Down
 	};
 
 	for (const Vector2& dir : directions)
@@ -134,9 +138,11 @@ std::vector<Node*> AStar::GetChildrens(Node* current, const std::vector<std::vec
 			newPos.y >= 0 && newPos.y < grid[0].size())
 		{
 			// Check if the position is walkable (not an obstacle)
-			if (grid[newPos.x][newPos.y] == 0) // Assuming 0 is walkable and 1 is an obstacle
+			if (grid[newPos.x][newPos.y] < 1) // Assuming 0 is walkable and 1 is an obstacle
 			{
-				childrens.push_back(new Node(newPos));
+				Node* newNode = new Node(newPos);
+				newNode->costMultiplier = grid[newPos.x][newPos.y];
+				childrens.push_back(newNode);
 			}
 		}
 	}
